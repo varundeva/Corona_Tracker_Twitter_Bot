@@ -54,29 +54,42 @@ def statePost(stateCode,id,name):
     #STATE API End Point
     url = "https://api.covid19india.org/data.json"
     res = requests.get(url)
+    stateName=activeCases=confimedCases=deaths=recovered=lut =""
+    isDataAvailable=""
     if res.status_code == 200:
         data = res.json()
         for state in data['statewise']:
-            if(stateCode.upper() == state['statecode']):
+            if stateCode.upper() == state['statecode'].upper():
+                print("State Code Valid")
                 activeCases = format(int(state['active']),',d')
                 confimedCases = format(int(state['confirmed']),',d')
                 deaths = format(int(state['deaths']),',d')
                 recovered = format(int(state['recovered']),',d')
                 stateName = state['state']
                 lut = state['lastupdatedtime']
-                time.sleep(2)
-                sendStateReply(activeCases,confimedCases,deaths,recovered,stateName,lut,id,name)
-            else:
-                text=' Something Wrong..\n Please Try Again After Sometime.\nPlease Use Correct State Code (2Letters)\n\nMention @Covid19Stat_bot then #state [State Code] \n Ex- @Covid19Stat_bot #state DL \n Follow Us \n #Corona #Covid19Updates #CoronaUpdate'
-                api.update_status('@'+ name + text,id)
-                store_last_seen_id(id, file_name)   
+                isDataAvailable = True
+                break
+            # else:
+            #     print("Invalid State Code")
+            #     text=' Something Wrong...\nPlease Try Again After Sometime.\nPlease Use Correct State Code (2Letters)\n\nMention - @Covid19Stat_bot then #state [State Code] \n Ex- @Covid19Stat_bot #state DL \n Follow Us \n #Corona #Covid19Updates #CoronaUpdate'
+            #     api.update_status('@'+ name + text,id)
+            #     store_last_seen_id(id, file_name) 
+        if isDataAvailable == True:
+            print("Calling sendStateReply()")
+            sendStateReply(activeCases,confimedCases,deaths,recovered,stateName,lut,id,name)
+        else:
+            print("Invalid State Code")
+            text=' Something Wrong...\nPlease Try Again After Sometime.\nPlease Use Correct State Code (2Letters)\n\nMention - @Covid19Stat_bot then #state [State Code] \n Ex- @Covid19Stat_bot #state DL \n Follow Us \n #Corona #Covid19Updates #CoronaUpdate'
+            api.update_status('@'+ name + text,id)
+            store_last_seen_id(id, file_name) 
     else:
         text=' Something Wrong..\nPlease Try again Later\nPlease Follow Correct Method and Try Again Later\n\nMention @Covid19Stat_bot then #state [State Code] \n Ex- @Covid19Stat_bot #state DL \n Follow Us \n #Corona #Covid19Updates #CoronaUpdate'
         api.update_status('@'+ name + text,id)
         store_last_seen_id(id, file_name)
         print("State API Error - " + str(datetime.now()))
         logger.error("State API Error")
-        
+    
+
 
 def countryPost(country,id,name):
     #COUNTRY API End Point

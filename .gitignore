@@ -8,3 +8,4 @@ share
 pyvenv.cfg
 state_error.log
 credentials.py
+country_error.log
