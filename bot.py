@@ -30,7 +30,7 @@ def store_last_seen_id(last_seen_id, file_name):
     return
 
 def sendCountryReply(cases,deaths,recovered,id,name,country_name):
-    tweetText = "🦠COVID-19 CORONAVIRUS🦠\n🌎Data of Country - "+country_name.capitalize()+"🌐 \n\n😟Total Cases : "+str(cases)+"\n😀Total Recoverd : "+str(recovered)+"\n😔Total Deaths : "+str(deaths)+"\n#Corona #Covid19 #Coronavirus #Follow #CoronaUpdate"
+    tweetText = " Hey "+name+"\n🦠COVID-19 CORONAVIRUS🦠\n🌎Data of Country - "+country_name.capitalize()+"🌐 \n\n😟Total Cases : "+str(cases)+"\n😀Total Recoverd : "+str(recovered)+"\n😔Total Deaths : "+str(deaths)+"\n#Corona #Covid19 #Coronavirus #Follow #CoronaUpdate"
     if api.update_status('@'+ name + tweetText,id):
         store_last_seen_id(id, file_name)
         print('Reply Sent')
@@ -41,37 +41,31 @@ def sendCountryReply(cases,deaths,recovered,id,name,country_name):
         print('Failed to send Reply')
 
 def sendStateReply(activeCases,confimedCases,deaths,recovered,stateName,lut,id,name):
-    tweetText ="Hey "+name+",\n🦠COVID-19 CORONAVIRUS PANDEMIC 🦠\n📍"+stateName.capitalize()+" State📍\n😟active - "+activeCases+"\n😢confirmed - "+confimedCases+"\n😔deaths - "+deaths+"\n😃recovered - "+recovered+"\nStay Home | Stay Safe\n⌛Last Update - "+lut+"\n#CornaVirus #Covid19 #Follow #Updates"
+    tweetText =" Hey "+name+"!\n🦠COVID-19 #CORONAVIRUS PANDEMIC 🦠\n📍"+stateName.capitalize()+" State📍\n😟active - "+activeCases+"\n😢confirmed - "+confimedCases+"\n😔deaths - "+deaths+"\n😃recovered - "+recovered+"\nStay Home | Stay Safe\n⌛Last Update - "+lut+"\n#CornaVirus #Covid19 #Follow #Updates"
     if api.update_status('@'+ name + tweetText,id):
         store_last_seen_id(id, file_name)
         print('Reply Sent to '+name)
     else:
-        text = 'Something Wrong..\n Please Try Again After Sometime \n\n Follow Us \n #Corona #Covid19Updates #CoronaUpdate'
+        text = ' Something Wrong..\n Please Try Again After Sometime \n\n Follow Us \n #Corona #Covid19Updates #CoronaUpdate'
         api.update_status('@'+ name +text ,id)
-        store_last_seen_id(id, file_name)
-        print('Failed to send Reply')
-    
+        store_last_seen_id(id, file_name)    
         
-
 def statePost(stateCode,id,name):
-    #API End Point
+    #STATE API End Point
     url = "https://api.covid19india.org/data.json"
     res = requests.get(url)
     if res.status_code == 200:
         data = res.json()
         for state in data['statewise']:
-            if(stateCode.lower() == state['statecode'].lower()):
+            if(stateCode.upper() == state['statecode']):
                 activeCases = format(int(state['active']),',d')
                 confimedCases = format(int(state['confirmed']),',d')
                 deaths = format(int(state['deaths']),',d')
                 recovered = format(int(state['recovered']),',d')
                 stateName = state['state']
                 lut = state['lastupdatedtime']
-                try:
-                    sendStateReply(activeCases,confimedCases,deaths,recovered,stateName,lut,id,name)
-                    print("Got True At sendStateReply()")
-                except:
-                    print("Error at sendStateReply()")
+                time.sleep(2)
+                sendStateReply(activeCases,confimedCases,deaths,recovered,stateName,lut,id,name)
             else:
                 text=' Something Wrong..\n Please Try Again After Sometime.\nPlease Use Correct State Code (2Letters)\n\nMention @Covid19Stat_bot then #state [State Code] \n Ex- @Covid19Stat_bot #state DL \n Follow Us \n #Corona #Covid19Updates #CoronaUpdate'
                 api.update_status('@'+ name + text,id)
@@ -85,7 +79,7 @@ def statePost(stateCode,id,name):
         
 
 def countryPost(country,id,name):
-    #API End Point
+    #COUNTRY API End Point
     url = "https://covid19-server.chrismichael.now.sh/api/v1/ReportsByCountries/"
     res = requests.get(url+country)
     if res.status_code == 200:
@@ -97,7 +91,6 @@ def countryPost(country,id,name):
         cases = format (cases, ',d')
         deaths =format (deaths, ',d')
         recovered = format (recovered, ',d')
-        print("called sendreply()")
         sendCountryReply(cases,deaths,recovered,id,name,country_name)
     else:
         text=' Something Wrong..\n Please Follow Correct Method Mention @Covid19Stat_bot then #country [Country Name (use - between 2 words] \n Ex- @Covid19Stat_bot #country us \n Follow Us \n #Corona #Covid19Updates #CoronaUpdate'
@@ -112,7 +105,7 @@ def MentionWatch():
     mentions = api.mentions_timeline(last_seen_id)
     for mention in reversed(mentions):
         if mention.user.id == 849074973301977088 :
-            print("self")
+            print("self mention found")
             store_last_seen_id(mention.id, file_name)
             break
         print(str(mention.id)+ ' - ' +mention.user.screen_name)
