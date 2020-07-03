@@ -4,6 +4,7 @@ import time
 from datetime import datetime
 import logging
 import re
+
 import credentials #credentials.py file contains all 4 tokens and secrets
 
 
@@ -14,6 +15,8 @@ api = tweepy.API(auth,wait_on_rate_limit=True, wait_on_rate_limit_notify=True)  
 logging.basicConfig(filename="global_error.log", format='%(asctime)s %(message)s', filemode='w')
 logger=logging.getLogger()
 logger.setLevel(logging.DEBUG)
+
+
 
 #Tweet Global Statistics
 def globalDataTweet():
@@ -30,9 +33,13 @@ def globalDataTweet():
         recovered = format (recovered, ',d')
         sendTweet(cases,deaths,recovered)
         
+        # print("Total Cases "+str(cases))
+        # print("Total Death "+str(deaths))
+        # print("Total Recovered "+str(recovered))
     else:
         print("API Error - " + str(datetime.now()))
         logger.error("API Error") 
+
 
 # Function to Send Tweets /  This function called in globalDataTweet() function
 def sendTweet(cases,deaths,recovered):
@@ -41,6 +48,7 @@ def sendTweet(cases,deaths,recovered):
         print('tweeted')
     else:
         print('error in tweepy')
+
 
 #Do Tweet Every Hour 
 while True:
